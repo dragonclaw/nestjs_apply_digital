@@ -2,7 +2,7 @@ name: Run integration testing
 
 on:
   push:
-    branches: [main]
+    branches: [develop]
   pull_request:
     branches: [main]
 
