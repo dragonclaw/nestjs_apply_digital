@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Cron } from '@nestjs/schedule';
 import { DeletedProduct } from './entities/deleted_product.entity';
 import { PageOptionsDto } from './dto/page-options.dto';
+import { ConfigService } from '@nestjs/config';
 
 interface SingleProduct {
   metadata: object;
@@ -44,6 +45,7 @@ export class ProductsService {
     @InjectRepository(Product) private productRepository: Repository<Product>,
     @InjectRepository(DeletedProduct)
     private deletedProductRepository: Repository<DeletedProduct>,
+    private configService: ConfigService,
   ) {}
 
   @Cron('* * 1 * * *')
@@ -52,7 +54,13 @@ export class ProductsService {
     const { data } = await firstValueFrom(
       this.httpService
         .get(
-          'https://cdn.contentful.com/spaces/9xs1613l9f7v/environments/master/entries?access_token=I-ThsT55eE_B3sCUWEQyDT4VqVO3x__20ufuie9usns&content_type=product',
+          `spaces/${this.configService.get('CONTENTFUL_SPACE_ID')}/environments/${this.configService.get('CONTENTFUL_ENVIRONMENT')}/entries`,
+          {
+            params: {
+              access_token: this.configService.get('CONTENTFUL_ACCESS'),
+              content_type: this.configService.get('CONTENTFUL_CONTENT_TYPE'),
+            },
+          },
         )
         .pipe(
           catchError((error: AxiosError) => {
