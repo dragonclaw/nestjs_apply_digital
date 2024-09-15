@@ -5,10 +5,11 @@ import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Like, MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cron } from '@nestjs/schedule';
 import { DeletedProduct } from './entities/deleted_product.entity';
+import { PageOptionsDto } from './dto/page-options.dto';
 
 interface SingleProduct {
   metadata: object;
@@ -60,15 +61,19 @@ export class ProductsService {
           }),
         ),
     );
-    console.log('data', data);
+
     data.items.forEach(async (product: SingleProduct) => {
-      const foundProduct = this.productRepository.findOne({
+      const foundProduct = await this.productRepository.findOne({
         where: { product_id: product.sys.id },
       });
-      if (foundProduct) {
-        console.log('Product already exists');
+      const foundDeletedProduct = await this.deletedProductRepository.findOne({
+        where: { product_id: product.sys.id },
+      });
+      if (foundProduct || foundDeletedProduct) {
+        console.log('Product exists or was deleted');
         return;
       }
+      console.log('Creating product');
       const createdProduct = await this.productRepository.create({
         product_id: product.sys.id,
         product_date: product.sys.createdAt,
@@ -93,9 +98,36 @@ export class ProductsService {
     return 'This action adds a new product';
   }
 
-  //TODO: Pagination here
-  async findAll() {
-    return this.productRepository.find();
+  async findAll(PageOptionsDto: PageOptionsDto) {
+    const {
+      page,
+      limit,
+      priceMax,
+      priceMin,
+      filterByBrand,
+      filterByCategory,
+      filterByName,
+    } = PageOptionsDto;
+
+    const offset = (page - 1) * limit;
+    const [products, total] = await this.productRepository.findAndCount({
+      where: {
+        ...(filterByBrand && { product_brand: Like(`%${filterByBrand}%`) }),
+        ...(filterByCategory && {
+          product_category: Like(`%${filterByCategory}%`),
+        }),
+        ...(filterByName && { product_name: Like(`%${filterByName}%`) }),
+        ...(priceMin && {
+          product_price: MoreThan(priceMin),
+        }),
+        ...(priceMax && {
+          product_price: LessThan(priceMax),
+        }),
+      },
+      skip: offset,
+      take: limit,
+    });
+    return { products, total, page, limit };
   }
 
   findOne(id: number) {
