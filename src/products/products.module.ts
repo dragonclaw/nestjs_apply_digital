@@ -5,9 +5,19 @@ import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { DeletedProduct } from './entities/deleted_product.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [HttpModule, TypeOrmModule.forFeature([Product, DeletedProduct])],
+  imports: [
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        baseURL: configService.get('CONTENTFUL_BASE_URL'),
+      }),
+      inject: [ConfigService],
+    }),
+    TypeOrmModule.forFeature([Product, DeletedProduct]),
+  ],
   controllers: [ProductsController],
   providers: [ProductsService],
 })

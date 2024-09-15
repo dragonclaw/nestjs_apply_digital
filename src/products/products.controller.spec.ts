@@ -5,10 +5,12 @@ import { HttpService } from '@nestjs/axios';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { DeletedProduct } from './entities/deleted_product.entity';
+import { ConfigService } from '@nestjs/config';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
   const fakeHttpService: Partial<HttpService> = { get: jest.fn() };
+  const fakeConfigService: Partial<ConfigService> = { get: jest.fn() };
   const mockRepository = () => {};
 
   beforeEach(async () => {
@@ -17,6 +19,7 @@ describe('ProductsController', () => {
       providers: [
         ProductsService,
         { provide: HttpService, useValue: fakeHttpService },
+        { provide: ConfigService, useValue: fakeConfigService },
         {
           provide: getRepositoryToken(Product),
           useFactory: mockRepository,
