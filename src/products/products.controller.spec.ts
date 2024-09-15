@@ -4,6 +4,7 @@ import { ProductsService } from './products.service';
 import { HttpService } from '@nestjs/axios';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
+import { DeletedProduct } from './entities/deleted_product.entity';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -18,6 +19,10 @@ describe('ProductsController', () => {
         { provide: HttpService, useValue: fakeHttpService },
         {
           provide: getRepositoryToken(Product),
+          useFactory: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(DeletedProduct),
           useFactory: mockRepository,
         },
       ],
