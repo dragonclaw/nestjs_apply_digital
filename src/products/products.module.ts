@@ -4,9 +4,10 @@ import { ProductsController } from './products.controller';
 import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
+import { DeletedProduct } from './entities/deleted_product.entity';
 
 @Module({
-  imports: [HttpModule, TypeOrmModule.forFeature([Product])],
+  imports: [HttpModule, TypeOrmModule.forFeature([Product, DeletedProduct])],
   controllers: [ProductsController],
   providers: [ProductsService],
 })
