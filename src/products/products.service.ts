@@ -1,6 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
@@ -50,7 +48,6 @@ export class ProductsService {
 
   @Cron('0 * * * *')
   async fetchProductsContentful() {
-    console.log('Fetching products from Contentful every 1 hour');
     const { data } = await firstValueFrom(
       this.httpService
         .get(
@@ -78,10 +75,8 @@ export class ProductsService {
         where: { product_id: product.sys.id },
       });
       if (foundProduct || foundDeletedProduct) {
-        console.log('Product exists or was deleted');
         return;
       }
-      console.log('Creating product');
       const createdProduct = await this.productRepository.create({
         product_id: product.sys.id,
         product_date: product.sys.createdAt,
@@ -99,11 +94,6 @@ export class ProductsService {
     });
 
     return `${JSON.stringify({ success: true })}`;
-  }
-
-  create(createProductDto: CreateProductDto) {
-    console.log('createProductDto', createProductDto);
-    return 'This action adds a new product';
   }
 
   async findAll(PageOptionsDto: PageOptionsDto) {
@@ -148,13 +138,10 @@ export class ProductsService {
     return allDeletedProducts;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
-  }
-
-  update(id: number, updateProductDto: UpdateProductDto) {
-    console.log(updateProductDto);
-    return `This action updates a #${id} product`;
+  async findOne(id: number) {
+    return await this.productRepository.findOne({
+      where: { id },
+    });
   }
 
   async remove(id: number) {
