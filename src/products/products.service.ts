@@ -48,7 +48,7 @@ export class ProductsService {
     private configService: ConfigService,
   ) {}
 
-  @Cron('* * 1 * * *')
+  @Cron('0 * * * *')
   async fetchProductsContentful() {
     console.log('Fetching products from Contentful every 1 hour');
     const { data } = await firstValueFrom(
