@@ -1,43 +1,39 @@
-import {
-  Controller,
-  Get,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, UseGuards, Query } from '@nestjs/common';
 import { ReportsService } from './reports.service';
-import { UpdateReportDto } from './dto/update-report.dto';
 import { AuthGuard } from '../guards/auth.guard';
+import { ReportDateRangeDto } from './dto/report-date-range.dto';
 
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @UseGuards(AuthGuard)
-  @Get()
+  @Get('listDeletedProductsByPercentage')
   listDeletedProductsByPercentage() {
     return this.reportsService.deletedProductsByPercentage();
   }
 
-  @Get()
-  findAll() {
-    return this.reportsService.findAll();
+  @UseGuards(AuthGuard)
+  @Get('listProductsWithPrice')
+  listProductsPercentageWithPrice() {
+    return this.reportsService.productsPercentageWithPrice();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reportsService.findOne(+id);
+  @UseGuards(AuthGuard)
+  @Get('listProductsWithoutPrice')
+  listProductsWithoutPrice() {
+    return this.reportsService.productsPercentageWithoutPrice();
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReportDto: UpdateReportDto) {
-    return this.reportsService.update(+id, updateReportDto);
+  @UseGuards(AuthGuard)
+  @Get('listProductsWithDateRange')
+  listProductsWithDateRange(@Query() reportDateRangeDto: ReportDateRangeDto) {
+    return this.reportsService.productsWithDateRange(reportDateRangeDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reportsService.remove(+id);
+  @UseGuards(AuthGuard)
+  @Get('listProductsWithDifferentCategories')
+  listProductsWithDifferentCategories() {
+    return this.reportsService.productsWithDifferentCategories();
   }
 }

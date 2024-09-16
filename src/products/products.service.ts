@@ -138,6 +138,16 @@ export class ProductsService {
     return { products, total, page, limit };
   }
 
+  async returnsAllProducts() {
+    const allProducts = await this.productRepository.find();
+    return allProducts;
+  }
+
+  async returnsAllDeletedProducts() {
+    const allDeletedProducts = await this.deletedProductRepository.find();
+    return allDeletedProducts;
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} product`;
   }

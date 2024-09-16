@@ -1,27 +1,47 @@
 import { Injectable } from '@nestjs/common';
-
-import { UpdateReportDto } from './dto/update-report.dto';
+import { ReportDateRangeDto } from './dto/report-date-range.dto';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class ReportsService {
-  deletedProductsByPercentage() {
-    return 'This lists the deleted products by percentage';
+  constructor(private productsService: ProductsService) {}
+
+  //REFACTOR TO USE QUERYBUILDER INSTEAD OF ES6 Functional Programming
+  async deletedProductsByPercentage() {
+    const deletedProducts =
+      await this.productsService.returnsAllDeletedProducts();
+    const availableProducts = await this.productsService.returnsAllProducts();
+    const deletedProductsPercentage =
+      (deletedProducts.length / availableProducts.length) * 100;
+    return { deletedProductsPercentage };
   }
 
-  findAll() {
-    return `This action returns all reports`;
+  async productsPercentageWithPrice() {
+    const availableProducts = await this.productsService.returnsAllProducts();
+    const productsWithPrice = availableProducts.filter(
+      (product) => product.product_price,
+    );
+    const productsWithPricePercentage =
+      (productsWithPrice.length / availableProducts.length) * 100;
+    return { productsWithPricePercentage };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} report`;
+  async productsPercentageWithoutPrice() {
+    const availableProducts = await this.productsService.returnsAllProducts();
+    const productsWithPrice = availableProducts.filter(
+      (product) => !product.product_price,
+    );
+    const productsWithoutPricePercentage =
+      (productsWithPrice.length / availableProducts.length) * 100;
+    return { productsWithoutPricePercentage };
   }
 
-  update(id: number, updateReportDto: UpdateReportDto) {
-    console.log(updateReportDto);
-    return `This action updates a #${id} report`;
+  productsWithDateRange(reportDateRangeDto: ReportDateRangeDto) {
+    const { dateFrom, dateTo } = reportDateRangeDto;
+    return `This action updates a report from ${dateFrom} to ${dateTo}`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} report`;
+  productsWithDifferentCategories() {
+    return `This action removes a report`;
   }
 }
