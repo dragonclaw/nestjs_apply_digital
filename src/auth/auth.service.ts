@@ -16,9 +16,7 @@ export class AuthService {
   ) {}
 
   async signUp(email: string, password: string) {
-    console.log('email', email, 'password', password);
     const user = await this.usersService.find(email);
-    console.log('this is the user', user);
     if (user.length) {
       throw new BadRequestException('User already exists');
     }
@@ -37,7 +35,6 @@ export class AuthService {
       throw new BadRequestException('Invalid password');
     }
     const payload = { email: user.email, id: user.id };
-    console.log(await this.jwtService.signAsync(payload));
     return { accessToken: await this.jwtService.signAsync(payload) };
   }
 }
