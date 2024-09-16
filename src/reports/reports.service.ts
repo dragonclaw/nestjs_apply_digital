@@ -1,12 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { ReportDateRangeDto } from './dto/report-date-range.dto';
 import { ProductsService } from '../products/products.service';
+import { Product } from '../products/entities/product.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ReportsService {
-  constructor(private productsService: ProductsService) {}
+  constructor(
+    private productsService: ProductsService,
+    @InjectRepository(Product)
+    private productsRepository: Repository<Product>,
+  ) {}
 
-  //REFACTOR TO USE QUERYBUILDER INSTEAD OF ES6 Functional Programming
   async deletedProductsByPercentage() {
     const deletedProducts =
       await this.productsService.returnsAllDeletedProducts();
@@ -36,12 +42,26 @@ export class ReportsService {
     return { productsWithoutPricePercentage };
   }
 
-  productsWithDateRange(reportDateRangeDto: ReportDateRangeDto) {
+  async productsWithDateRange(reportDateRangeDto: ReportDateRangeDto) {
     const { dateFrom, dateTo } = reportDateRangeDto;
-    return `This action updates a report from ${dateFrom} to ${dateTo}`;
+    const products = await this.productsRepository
+      .createQueryBuilder('products')
+      .select('*')
+      .where('products.product_date BETWEEN :dateFrom AND :dateTo', {
+        dateFrom,
+        dateTo,
+      })
+      .getRawMany();
+    return products;
   }
 
-  productsWithDifferentCategories() {
-    return `This action removes a report`;
+  productsAndQuantityWithDifferentCategories() {
+    const distinctCategories = this.productsRepository
+      .createQueryBuilder('products')
+      .select('DISTINCT products.product_category as category')
+      .addSelect('COUNT(products.product_category) as quantity')
+      .groupBy('products.product_category')
+      .getRawMany();
+    return distinctCategories;
   }
 }

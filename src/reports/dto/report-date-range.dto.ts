@@ -1,9 +1,9 @@
-import { IsDate } from 'class-validator';
+import { IsDateString } from 'class-validator';
 
 export class ReportDateRangeDto {
-  @IsDate()
+  @IsDateString()
   readonly dateFrom: Date;
 
-  @IsDate()
+  @IsDateString()
   readonly dateTo: Date;
 }

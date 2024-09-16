@@ -34,6 +34,6 @@ export class ReportsController {
   @UseGuards(AuthGuard)
   @Get('listProductsWithDifferentCategories')
   listProductsWithDifferentCategories() {
-    return this.reportsService.productsWithDifferentCategories();
+    return this.reportsService.productsAndQuantityWithDifferentCategories();
   }
 }
