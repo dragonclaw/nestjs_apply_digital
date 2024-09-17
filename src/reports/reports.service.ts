@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ReportDateRangeDto } from './dto/report-date-range.dto';
 import { ProductsService } from '../products/products.service';
 import { Product } from '../products/entities/product.entity';
@@ -14,54 +14,74 @@ export class ReportsService {
   ) {}
 
   async deletedProductsByPercentage() {
-    const deletedProducts =
-      await this.productsService.returnsAllDeletedProducts();
-    const availableProducts = await this.productsService.returnsAllProducts();
-    const deletedProductsPercentage =
-      (deletedProducts.length / availableProducts.length) * 100;
-    return { deletedProductsPercentage };
+    try {
+      const deletedProducts =
+        await this.productsService.returnsAllDeletedProducts();
+      const availableProducts = await this.productsService.returnsAllProducts();
+      const deletedProductsPercentage =
+        (deletedProducts.length / availableProducts.length) * 100;
+      return { deletedProductsPercentage };
+    } catch (error) {
+      throw new ServiceUnavailableException(error);
+    }
   }
 
   async productsPercentageWithPrice() {
-    const availableProducts = await this.productsService.returnsAllProducts();
-    const productsWithPrice = availableProducts.filter(
-      (product) => product.product_price,
-    );
-    const productsWithPricePercentage =
-      (productsWithPrice.length / availableProducts.length) * 100;
-    return { productsWithPricePercentage };
+    try {
+      const availableProducts = await this.productsService.returnsAllProducts();
+      const productsWithPrice = availableProducts.filter(
+        (product) => product.product_price,
+      );
+      const productsWithPricePercentage =
+        (productsWithPrice.length / availableProducts.length) * 100;
+      return { productsWithPricePercentage };
+    } catch (error) {
+      throw new ServiceUnavailableException(error);
+    }
   }
 
   async productsPercentageWithoutPrice() {
-    const availableProducts = await this.productsService.returnsAllProducts();
-    const productsWithPrice = availableProducts.filter(
-      (product) => !product.product_price,
-    );
-    const productsWithoutPricePercentage =
-      (productsWithPrice.length / availableProducts.length) * 100;
-    return { productsWithoutPricePercentage };
+    try {
+      const availableProducts = await this.productsService.returnsAllProducts();
+      const productsWithPrice = availableProducts.filter(
+        (product) => !product.product_price,
+      );
+      const productsWithoutPricePercentage =
+        (productsWithPrice.length / availableProducts.length) * 100;
+      return { productsWithoutPricePercentage };
+    } catch (error) {
+      throw new ServiceUnavailableException(error);
+    }
   }
 
   async productsWithDateRange(reportDateRangeDto: ReportDateRangeDto) {
-    const { dateFrom, dateTo } = reportDateRangeDto;
-    const products = await this.productsRepository
-      .createQueryBuilder('products')
-      .select('*')
-      .where('products.product_date BETWEEN :dateFrom AND :dateTo', {
-        dateFrom,
-        dateTo,
-      })
-      .getRawMany();
-    return products;
+    try {
+      const { dateFrom, dateTo } = reportDateRangeDto;
+      const products = await this.productsRepository
+        .createQueryBuilder('products')
+        .select('*')
+        .where('products.product_date BETWEEN :dateFrom AND :dateTo', {
+          dateFrom,
+          dateTo,
+        })
+        .getRawMany();
+      return products;
+    } catch (error) {
+      throw new ServiceUnavailableException(error);
+    }
   }
 
   productsAndQuantityWithDifferentCategories() {
-    const distinctCategories = this.productsRepository
-      .createQueryBuilder('products')
-      .select('DISTINCT products.product_category as category')
-      .addSelect('COUNT(products.product_category) as quantity')
-      .groupBy('products.product_category')
-      .getRawMany();
-    return distinctCategories;
+    try {
+      const distinctCategories = this.productsRepository
+        .createQueryBuilder('products')
+        .select('DISTINCT products.product_category as category')
+        .addSelect('COUNT(products.product_category) as quantity')
+        .groupBy('products.product_category')
+        .getRawMany();
+      return distinctCategories;
+    } catch (error) {
+      throw new ServiceUnavailableException(error);
+    }
   }
 }

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
@@ -62,7 +66,7 @@ export class ProductsService {
         .pipe(
           catchError((error: AxiosError) => {
             console.error(error.response.data);
-            throw 'An error happened!';
+            throw new ServiceUnavailableException(error.response.data);
           }),
         ),
     );
@@ -92,7 +96,6 @@ export class ProductsService {
       });
       await this.productRepository.save(createdProduct);
     });
-
     return `${JSON.stringify({ success: true })}`;
   }
 
@@ -139,9 +142,13 @@ export class ProductsService {
   }
 
   async findOne(id: number) {
-    return await this.productRepository.findOne({
+    const product = await this.productRepository.findOne({
       where: { id },
     });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return product;
   }
 
   async remove(id: number) {

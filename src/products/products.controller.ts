@@ -11,6 +11,11 @@ export class ProductsController {
     return this.productsService.findAll(PageOptionsDto);
   }
 
+  @Get('deletedProducts')
+  findAllDeletedProducts() {
+    return this.productsService.returnsAllDeletedProducts();
+  }
+
   @Get('fetch')
   fetchProducts() {
     return this.productsService.fetchProductsContentful();
