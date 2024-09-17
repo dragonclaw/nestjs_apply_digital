@@ -96,7 +96,7 @@ export class ProductsService {
       });
       await this.productRepository.save(createdProduct);
     });
-    return `${JSON.stringify({ success: true })}`;
+    return { success: true };
   }
 
   async findAll(PageOptionsDto: PageOptionsDto) {
