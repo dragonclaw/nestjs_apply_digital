@@ -27,7 +27,7 @@ The first run it's recommended to run with this command:
 $ docker compose up --build
 ```
 
-This should start 3 docker containers, one for the NestJS, other for the PosgreSQL database and finally a PgAdmin manager to manage the PosgreSQL database.
+This should start 3 docker containers, one for the NestJS, other for the PosgreSQL database and finally a PgAdmin manager to manage the PosgreSQL database. The first time running this project, you could see a error connecting to the database, it's completely normal giving that the PosgreSQL container has not been deployed. Please wait for all 3 docker container to run in order for the NestJS project to run properly as expected.
 
 The project is running in http://localhost:3000 and the root endpoint is a health-check. If everything is working you should see a text with:
 **Server Working**
