@@ -7,7 +7,7 @@ import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { Product } from './entities/product.entity';
-import { LessThan, Like, MoreThan, Repository } from 'typeorm';
+import { LessThan, MoreThan, Repository, ILike } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cron } from '@nestjs/schedule';
 import { DeletedProduct } from './entities/deleted_product.entity';
@@ -88,11 +88,11 @@ export class ProductsService {
     const offset = (page - 1) * limit;
     const [products, total] = await this.productRepository.findAndCount({
       where: {
-        ...(filterByBrand && { product_brand: Like(`%${filterByBrand}%`) }),
+        ...(filterByBrand && { product_brand: ILike(`%${filterByBrand}%`) }),
         ...(filterByCategory && {
-          product_category: Like(`%${filterByCategory}%`),
+          product_category: ILike(`%${filterByCategory}%`),
         }),
-        ...(filterByName && { product_name: Like(`%${filterByName}%`) }),
+        ...(filterByName && { product_name: ILike(`%${filterByName}%`) }),
         ...(priceMin && {
           product_price: MoreThan(priceMin),
         }),
