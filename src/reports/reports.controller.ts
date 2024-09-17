@@ -1,6 +1,6 @@
 import { Controller, Get, UseGuards, Query } from '@nestjs/common';
 import { ReportsService } from './reports.service';
-import { AuthGuard } from '../guards/auth.guard';
+import { AuthGuard } from '../common/guards/auth.guard';
 import { ReportDateRangeDto } from './dto/report-date-range.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
