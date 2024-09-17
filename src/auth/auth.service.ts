@@ -16,8 +16,8 @@ export class AuthService {
   ) {}
 
   async signUp(email: string, password: string) {
-    const user = await this.usersService.find(email);
-    if (user.length) {
+    const user = await this.usersService.findByEmail(email);
+    if (user) {
       throw new BadRequestException('User already exists');
     }
     const passwordHash = await bcrypt.hash(password, 10);
@@ -25,7 +25,7 @@ export class AuthService {
   }
 
   async signIn(email: string, password: string) {
-    const [user] = await this.usersService.find(email);
+    const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }

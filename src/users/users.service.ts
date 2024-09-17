@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -12,27 +17,38 @@ export class UsersService {
   ) {}
 
   create(createUserDto: CreateUserDto) {
-    const { email, password } = createUserDto;
-    const user = this.usersRepository.create({ email, password });
-    return this.usersRepository.save(user);
+    try {
+      const { email, password } = createUserDto;
+      const user = this.usersRepository.create({ email, password });
+      return this.usersRepository.save(user);
+    } catch (error) {
+      throw new ServiceUnavailableException(error);
+    }
   }
 
   findAll() {
-    return this.usersRepository.find();
+    const users = this.usersRepository.find();
+    if (!users) throw new NotFoundException('No users found');
+    return users;
   }
 
   async findOne(id: number) {
-    return await this.usersRepository.findOne({ where: { id } });
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
-  find(email: string) {
-    return this.usersRepository.find({ where: { email } });
+
+  findByEmail(email: string) {
+    const user = this.usersRepository.findOne({ where: { email } });
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user: User = await this.usersRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
     user.email = updateUserDto.email;
-    user.password = updateUserDto.password;
+    user.password = await bcrypt.hash(updateUserDto.password, 10);
     return this.usersRepository.save(user);
   }
 

@@ -5,7 +5,11 @@ import { UsersService } from '../users/users.service';
 
 describe('AuthService', () => {
   const fakeJwtService: Partial<JwtService> = { signAsync: jest.fn() };
-  const fakeUsersService: Partial<UsersService> = { findOne: jest.fn() };
+  const fakeUsersService: Partial<UsersService> = {
+    findOne: jest.fn(),
+    findByEmail: jest.fn(),
+    create: jest.fn(),
+  };
   let service: AuthService;
 
   beforeEach(async () => {
