@@ -95,7 +95,7 @@ $ npm run test:cov
 
 # Technical discussion and appreciations
 
-The project is divided in modules and it connects to posgresql. It uses Husky for enforcing Conventional Commits and also ESLint Checking of the .ts files. The project uses gitflow and the commits and branches are fully displayed in the repo. The Github actions pipeline runs when pushing into develop (From a feature PR request), or when making a release and PR into the main branch. This pipelines run unit tests that are currently instantiated into the project. The github actions don't run any linting due the fact is run locally in the client via Husky.
+The project is divided in modules and it connects to posgresql. It uses Husky for enforcing Conventional Commits and also ESLint Checking of the .ts files. The project uses gitflow and the commits and branches are fully displayed in the repo. The Github actions pipeline runs when pushing into develop (From a feature PR request), or when making a release and PR into the main branch. We could have the github action rules to prevent pushing without the test running but for this project it won't be necessary. This pipelines run unit tests that are currently instantiated into the project. The github actions don't run any linting due the fact is run locally in the client via Husky.
 
 Also included is a .env.example file and has all the necessary variables needed to run the project in a dev environment. This .env file can be adapted to run into a production environment and we can follow the approach of having several .env files for each environment, or have a different .env file deployed in each of the environment.
 
